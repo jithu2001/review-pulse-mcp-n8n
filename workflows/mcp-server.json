@@ -1,0 +1,111 @@
+{
+  "name": "MCP Server doc+gmail",
+  "nodes": [
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create (do NOT send) a Gmail draft. Use the exact subject and message text provided.",
+        "resource": "draft",
+        "subject": "={{ $fromAI('Subject', 'Exact email subject, verbatim', 'string') }}",
+        "message": "={{ $fromAI('Message', 'Exact plain-text email body, verbatim, with line breaks preserved', 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        -80,
+        240
+      ],
+      "id": "43ae29e4-2b68-490d-a84e-63aaa6f8a72e",
+      "name": "Create a draft in Gmail",
+      "webhookId": "1b5366ea-1948-4967-b2cb-1432d5ad97d6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Append text to the end of the weekly product notes Google Doc. Pass the full note text verbatim.",
+        "operation": "update",
+        "documentURL": "YOUR_GOOGLE_DOC_URL",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $fromAI('Note_Text', 'Full weekly note to append, verbatim, with line breaks preserved', 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        160,
+        240
+      ],
+      "id": "6bcc0379-7fd6-4c37-a800-60a7b0a1004f",
+      "name": "Update a document in Google Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "review-pulse-mcp"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "508d56d6-d035-42d7-81fa-61398af1884a",
+      "name": "MCP Server Trigger1",
+      "webhookId": "b1679558-81b6-44ca-887f-c045266053f1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Create a draft in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a document in Google Docs": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "ea241777-48b2-4595-a1c9-47b23bbf5bbf",
+  "meta": {
+    "instanceId": "08ac0a00b6f5099a8c90d6f891858ce520b515ffb473f4d92e6bc6a7eea2b71e"
+  },
+  "nodeGroups": [],
+  "id": "kUjo5gd17LvuBCwP",
+  "tags": []
+}

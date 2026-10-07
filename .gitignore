@@ -1,0 +1,10 @@
+# Secrets / local overrides
+.env
+*.local.json
+
+# Dependencies
+node_modules/
+
+# OS junk
+.DS_Store
+Thumbs.db
