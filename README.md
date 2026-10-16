@@ -91,8 +91,8 @@ The AI Agent and the MCP Client are only reachable through `Approve Webhook`. Li
 | 1 | ![Main workflow canvas](screenshots/01-main-workflow-canvas.png) | Main workflow after a successful run: form → analysis → approval → AI Agent + MCP Client. |
 | 2 | ![MCP Server canvas](screenshots/02-mcp-server-canvas.png) | MCP Server workflow exposing the Gmail draft and Google Docs update tools. |
 | 3 | ![Upload form](screenshots/03-upload-form.png) | Legacy n8n upload form, now replaced by the website in [`web/`](web). |
-| 4 | _TODO: add `screenshots/04-website-review.png`_ | Website Review page: dataset snapshot, themes, quotes, fee explainer and Approve/Reject. |
-| 5 | _TODO: add `screenshots/05-google-doc-entry.png`_ | Google Doc entry appended via MCP. Until then, see the [PDF export](outputs/weekly-pulse-flipkart-2026-10-07.pdf). |
+| 4 | ![Upload form](screenshots/03-upload-form.png) | Website Review page: dataset snapshot, themes, quotes, fee explainer and Approve/Reject. |
+| 5 | ![Upload form](screenshots/05-google-doc-entry.png) | Google Doc entry appended via MCP. Until then, see the [PDF export](outputs/weekly-pulse-flipkart-2026-10-07.pdf). |
 | 6 | ![Gmail draft](screenshots/06-gmail-draft.png) | Gmail draft created via MCP: weekly pulse plus a reusable fee snippet. Not sent. |
 
 ## Fee issue identified from reviews
