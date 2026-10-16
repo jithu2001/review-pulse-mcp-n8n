@@ -140,4 +140,4 @@ review-pulse-mcp/
 
 ## License
 
-[MIT](LICENSE) © 2026 Jithu J george
+[MIT](LICENSE) © 2026 Jithu J George
