@@ -3,43 +3,6 @@
   "nodes": [
     {
       "parameters": {
-        "formTitle": "Review Intelligence → Weekly Pulse + Fee Explainer",
-        "formDescription": "Upload a public reviews CSV (last 8-12 weeks). The workflow analyses the reviews, then shows you the results for APPROVAL before anything is written to Google Docs or Gmail.",
-        "formFields": {
-          "values": [
-            {
-              "fieldLabel": "product_name",
-              "placeholder": "e.g. Groww",
-              "requiredField": true
-            },
-            {
-              "fieldLabel": "binary_file",
-              "fieldType": "file",
-              "multipleFiles": false,
-              "acceptFileTypes": ".csv",
-              "requiredField": true
-            },
-            {
-              "fieldLabel": "official_sources",
-              "fieldType": "textarea",
-              "placeholder": "Optional: official pricing/help URLs, one per line"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "fd9ebd36-6071-4541-a929-f7f3059d9ac8",
-      "name": "On form submission",
-      "type": "n8n-nodes-base.formTrigger",
-      "typeVersion": 2.2,
-      "position": [
-        -992,
-        304
-      ],
-      "webhookId": "f3176039-68f6-4a9c-a03d-396fc5849f6a"
-    },
-    {
-      "parameters": {
         "binaryPropertyName": "binary_file",
         "options": {
           "enableBOM": true
@@ -80,7 +43,7 @@
         "responses": {
           "values": [
             {
-              "content": "=Product: {{ $('On form submission').first().json.product_name }}\n\nAnalyze the following customer reviews (last 8-12 weeks) for this product.\n\n{{ JSON.stringify($json.reviews) }}\n\nOutput ONLY these four sections:\n\n1. THEMES\n- Cluster all reviews into a maximum of 5 themes.\n- Give each theme a short name, a 1-line description and an approximate count of reviews in it.\n\n2. TOP 3 THEMES\n- Identify the 3 most frequent or important themes.\n- Rank them #1 to #3.\n\n3. REAL USER QUOTES\n- Extract exactly 3 real user quotes from the reviews.\n- Use the quotes exactly as written.\n- Do not invent, rewrite, combine, or paraphrase quotes.\n- If possible, at least one quote should relate to the fee/charge confusion below.\n\n4. FEE/CHARGE CONFUSION\n- Identify exactly 1 recurring confusion or pain point related to a specific fee or charge.\n- Name the fee/charge precisely (e.g. \"exit load\", \"convenience fee\", \"auto-renewal charge\").\n- Explain the confusion briefly based only on the reviews, and state roughly how many reviews mention it.\n\nFor FEE/CHARGE CONFUSION:\n- Only identify a fee or charge confusion if multiple reviews actually mention confusion about a specific fee, charge, payment, billing, subscription charge, or unexpected payment.\n- Do NOT treat general complaints about Premium pricing, ads, or free-feature limitations as fee/charge confusion.\n- If no recurring fee/charge confusion exists in the reviews, write:\n\"No recurring fee/charge confusion found in the reviews.\"\n\nDo not add anything else."
+              "content": "=Product: {{ $('Analyze Webhook').first().json.body.product_name }}\n\nAnalyze the following customer reviews (last 8-12 weeks) for this product.\n\n{{ JSON.stringify($json.reviews) }}\n\nOutput ONLY these four sections:\n\n1. THEMES\n- Cluster all reviews into a maximum of 5 themes.\n- Give each theme a short name, a 1-line description and an approximate count of reviews in it.\n\n2. TOP 3 THEMES\n- Identify the 3 most frequent or important themes.\n- Rank them #1 to #3.\n\n3. REAL USER QUOTES\n- Extract exactly 3 real user quotes from the reviews.\n- Use the quotes exactly as written.\n- Do not invent, rewrite, combine, or paraphrase quotes.\n- If possible, at least one quote should relate to the fee/charge confusion below.\n\n4. FEE/CHARGE CONFUSION\n- Identify exactly 1 recurring confusion or pain point related to a specific fee or charge.\n- Name the fee/charge precisely (e.g. \"exit load\", \"convenience fee\", \"auto-renewal charge\").\n- Explain the confusion briefly based only on the reviews, and state roughly how many reviews mention it.\n\nFor FEE/CHARGE CONFUSION:\n- Only identify a fee or charge confusion if multiple reviews actually mention confusion about a specific fee, charge, payment, billing, subscription charge, or unexpected payment.\n- Do NOT treat general complaints about Premium pricing, ads, or free-feature limitations as fee/charge confusion.\n- If no recurring fee/charge confusion exists in the reviews, write:\n\"No recurring fee/charge confusion found in the reviews.\"\n\nDo not add anything else."
             }
           ]
         },
@@ -114,7 +77,7 @@
         "responses": {
           "values": [
             {
-              "content": "=Product: {{ $('On form submission').first().json.product_name }}\n\nUsing the customer review analysis provided below, generate a structured weekly product note of 250 words or fewer.\n\nReturn ONLY valid JSON in exactly this structure:\n\n{\n  \"top_themes\": [\"Theme summary 1\", \"Theme summary 2\", \"Theme summary 3\"],\n  \"supporting_quotes\": [\"Real user quote 1\", \"Real user quote 2\", \"Real user quote 3\"],\n  \"key_observation\": \"What is going wrong or what important trend is emerging.\",\n  \"action_ideas\": [\"Action idea 1\", \"Action idea 2\", \"Action idea 3\"]\n}\n\nRules:\n- top_themes must contain 2-4 concise summaries.\n- supporting_quotes must contain 2-3 real quotes taken from the analysis.\n- Keep quotes exactly as provided. Do not invent, rewrite, combine, or paraphrase them.\n- key_observation must be based only on the provided analysis.\n- action_ideas must contain exactly 3 practical and specific actions for the product team.\n- Keep the total content within 250 words.\n- Do not add any fields.\n- Do not add Markdown or explanations outside the JSON.\n\nCUSTOMER REVIEW ANALYSIS:\n{{ $json.output[0].content[0].text }}"
+              "content": "=Product: {{ $('Analyze Webhook').first().json.body.product_name }}\n\nUsing the customer review analysis provided below, generate a structured weekly product note of 250 words or fewer.\n\nReturn ONLY valid JSON in exactly this structure:\n\n{\n  \"top_themes\": [\"Theme summary 1\", \"Theme summary 2\", \"Theme summary 3\"],\n  \"supporting_quotes\": [\"Real user quote 1\", \"Real user quote 2\", \"Real user quote 3\"],\n  \"key_observation\": \"What is going wrong or what important trend is emerging.\",\n  \"action_ideas\": [\"Action idea 1\", \"Action idea 2\", \"Action idea 3\"]\n}\n\nRules:\n- top_themes must contain 2-4 concise summaries.\n- supporting_quotes must contain 2-3 real quotes taken from the analysis.\n- Keep quotes exactly as provided. Do not invent, rewrite, combine, or paraphrase them.\n- key_observation must be based only on the provided analysis.\n- action_ideas must contain exactly 3 practical and specific actions for the product team.\n- Keep the total content within 250 words.\n- Do not add any fields.\n- Do not add Markdown or explanations outside the JSON.\n\nCUSTOMER REVIEW ANALYSIS:\n{{ $json.output[0].content[0].text }}"
             }
           ]
         },
@@ -148,7 +111,7 @@
         "responses": {
           "values": [
             {
-              "content": "=Product: {{ $('On form submission').first().json.product_name }}\n\nBelow is a customer review analysis. Its section \"4. FEE/CHARGE CONFUSION\" names the fee/charge users are confused about.\n\nYour job: write a neutral, facts-only explainer for THAT EXACT fee/charge, for support agents to reuse with customers.\n\nHow to get facts:\n- Use web search to find the product company's OFFICIAL pages (pricing page, help centre / FAQ, terms, fee schedule) or the official regulator page about this fee.\n- Official sources supplied by the user (prefer these if relevant): {{ $('On form submission').first().json.official_sources || 'none supplied' }}\n- Never use blogs, Reddit, news sites, comparison sites or other third-party sources.\n- Every factual statement (amounts, percentages, timing, conditions) must come from those official sources. Do not invent pricing, policies or reasons.\n- If an official source does not state something, say it is not specified instead of guessing.\n\nReturn ONLY valid JSON in exactly this structure:\n\n{\n  \"identified_fee_issue\": \"Name of the fee + one sentence on what users are confused about (from the review analysis).\",\n  \"user_confusion_from_reviews\": \"One sentence summarising what reviewers said about this fee.\",\n  \"explanation_bullets\": [\n    \"Explanation point 1\",\n    \"Explanation point 2\",\n    \"Explanation point 3\",\n    \"Explanation point 4\",\n    \"Explanation point 5\",\n    \"Explanation point 6\"\n  ],\n  \"source_links\": [\"Official source URL 1\", \"Official source URL 2\"]\n}\n\nRules:\n- identified_fee_issue MUST be the fee/charge from the review analysis, not a different one.\n- explanation_bullets: at most 6 short points, neutral and facts-only (what the fee is, when it applies, how much / how it is calculated, how to avoid or check it, where to see it).\n- source_links: exactly 2 full official URLs you actually found.\n- If the analysis says no recurring fee/charge confusion was found, set identified_fee_issue to \"None found\" and explain in one bullet what data is missing.\n- Do not add any fields.\n- Do not add Markdown, citations or explanations outside the JSON.\n\nCUSTOMER REVIEW ANALYSIS:\n{{ $json.output[0].content[0].text }}"
+              "content": "=Product: {{ $('Analyze Webhook').first().json.body.product_name }}\n\nBelow is a customer review analysis. Its section \"4. FEE/CHARGE CONFUSION\" names the fee/charge users are confused about.\n\nYour job: write a neutral, facts-only explainer for THAT EXACT fee/charge, for support agents to reuse with customers.\n\nHow to get facts:\n- Use web search to find the product company's OFFICIAL pages (pricing page, help centre / FAQ, terms, fee schedule) or the official regulator page about this fee.\n- Official sources supplied by the user (prefer these if relevant): {{ $('Analyze Webhook').first().json.body.official_sources || 'none supplied' }}\n- Never use blogs, Reddit, news sites, comparison sites or other third-party sources.\n- Every factual statement (amounts, percentages, timing, conditions) must come from those official sources. Do not invent pricing, policies or reasons.\n- If an official source does not state something, say it is not specified instead of guessing.\n\nReturn ONLY valid JSON in exactly this structure:\n\n{\n  \"identified_fee_issue\": \"Name of the fee + one sentence on what users are confused about (from the review analysis).\",\n  \"user_confusion_from_reviews\": \"One sentence summarising what reviewers said about this fee.\",\n  \"explanation_bullets\": [\n    \"Explanation point 1\",\n    \"Explanation point 2\",\n    \"Explanation point 3\",\n    \"Explanation point 4\",\n    \"Explanation point 5\",\n    \"Explanation point 6\"\n  ],\n  \"source_links\": [\"Official source URL 1\", \"Official source URL 2\"]\n}\n\nRules:\n- identified_fee_issue MUST be the fee/charge from the review analysis, not a different one.\n- explanation_bullets: at most 6 short points, neutral and facts-only (what the fee is, when it applies, how much / how it is calculated, how to avoid or check it, where to see it).\n- source_links: exactly 2 full official URLs you actually found.\n- If the analysis says no recurring fee/charge confusion was found, set identified_fee_issue to \"None found\" and explain in one bullet what data is missing.\n- Do not add any fields.\n- Do not add Markdown, citations or explanations outside the JSON.\n\nCUSTOMER REVIEW ANALYSIS:\n{{ $json.output[0].content[0].text }}"
             }
           ]
         },
@@ -188,7 +151,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Prepare Data: parse both model outputs, build the Doc note, email and approval preview.\n\nfunction getText(item) {\n  const j = (item && item.json) || {};\n  if (typeof j.output === 'string') return j.output;\n  if (Array.isArray(j.output)) {\n    // With web search on, output[] contains a web_search_call first, then the message.\n    for (const o of j.output) {\n      if (o && o.type === 'message' && Array.isArray(o.content)) {\n        const c = o.content.find(x => typeof x.text === 'string');\n        if (c) return c.text;\n      }\n    }\n    for (const o of j.output) {\n      if (o && Array.isArray(o.content) && o.content[0] && typeof o.content[0].text === 'string') {\n        return o.content[0].text;\n      }\n    }\n  }\n  if (typeof j.text === 'string') return j.text;\n  if (j.message && typeof j.message.content === 'string') return j.message.content;\n  throw new Error('Could not find model text in: ' + JSON.stringify(j).slice(0, 500));\n}\n\nfunction parseJson(text, label) {\n  const s = text.replace(/```json|```/gi, '').trim();\n  const a = s.indexOf('{');\n  const b = s.lastIndexOf('}');\n  if (a === -1 || b === -1) throw new Error(label + ' did not return JSON: ' + s.slice(0, 300));\n  return JSON.parse(s.slice(a, b + 1));\n}\n\nconst arr = v => Array.isArray(v) ? v.filter(Boolean).map(String) : (v ? [String(v)] : []);\nconst stripQuotes = q => q.replace(/^[\"“”']+|[\"“”']+$/g, '').trim();\n\nconst pulse = parseJson(getText($('Message a model1').first()), 'Weekly Pulse model');\nconst fee = parseJson(getText($('Message a model2').first()), 'Fee Explainer model');\nconst form = $('On form submission').first().json;\n\nconst product = String(form.product_name || 'Product').trim();\nconst date = $now.toFormat('yyyy-MM-dd');\nconst lastChecked = $now.toFormat('dd LLL yyyy, HH:mm ZZZZ');\n\nconst topThemes = arr(pulse.top_themes);\nconst quotes = arr(pulse.supporting_quotes).map(stripQuotes);\nconst actions = arr(pulse.action_ideas);\nconst keyObservation = String(pulse.key_observation || '');\n\nconst feeIssue = String(fee.identified_fee_issue || '');\nconst reviewSignal = String(fee.user_confusion_from_reviews || '');\nconst bullets = arr(fee.explanation_bullets).slice(0, 6);\nconst sources = arr(fee.source_links).slice(0, 2);\n\n// ---------- Weekly pulse (<=250 words) ----------\nconst weeklyPulse = [\n  'Top themes:',\n  ...topThemes.map(t => '• ' + t),\n  '',\n  'What users are saying:',\n  ...quotes.map(q => '\"' + q + '\"'),\n  '',\n  'Key observation:',\n  keyObservation,\n  '',\n  'Action ideas for the product team:',\n  ...actions.map((a, i) => (i + 1) + '. ' + a)\n].join('\\n');\nconst pulseWords = weeklyPulse.split(/\\s+/).filter(Boolean).length;\n\n// ---------- Fee explainer snippet ----------\nconst feeSnippet = [\n  'Fee: ' + feeIssue,\n  '',\n  ...bullets.map(b => '• ' + b),\n  '',\n  'Official sources:',\n  ...sources.map(s => '• ' + s),\n  '',\n  'Last checked: ' + lastChecked\n].join('\\n');\n\n// ---------- Structured record required by the brief ----------\nconst record = {\n  date,\n  top_themes: topThemes,\n  weekly_pulse: weeklyPulse,\n  identified_fee_issue: feeIssue,\n  explanation_bullets: bullets,\n  source_links: sources\n};\n\nconst line = '='.repeat(60);\n\nconst docNote = [\n  '',\n  line,\n  'WEEKLY PRODUCT PULSE — ' + product + ' — ' + date,\n  line,\n  '',\n  'Date: ' + date,\n  '',\n  'Top Themes:',\n  ...topThemes.map(t => '• ' + t),\n  '',\n  'Weekly Pulse:',\n  weeklyPulse,\n  '',\n  'Identified Fee Issue:',\n  feeIssue,\n  reviewSignal ? 'Review signal: ' + reviewSignal : '',\n  '',\n  'Explanation:',\n  ...bullets.map(b => '• ' + b),\n  '',\n  'Official Sources:',\n  ...sources.map(s => '• ' + s),\n  '',\n  'Last checked: ' + lastChecked,\n  '',\n  'Structured record (JSON):',\n  JSON.stringify(record, null, 2),\n  ''\n].join('\\n');\n\nconst subject = 'Weekly Product Pulse + Customer Clarification — ' + product + ' (' + date + ')';\n\nconst emailBody = [\n  'Hi team,',\n  '',\n  'Here is this week\\'s product pulse for ' + product + ', plus a reusable support snippet for the fee users keep asking about.',\n  '',\n  '----- WEEKLY PRODUCT PULSE -----',\n  '',\n  weeklyPulse,\n  '',\n  '----- CUSTOMER FEE/CHARGE CLARIFICATION (reusable support snippet) -----',\n  '',\n  feeSnippet,\n  '',\n  'Thanks'\n].join('\\n');\n\n// ---------- Quality checks shown on the approval page ----------\nconst warnings = [];\nif (pulseWords > 250) warnings.push('Weekly pulse is ' + pulseWords + ' words (limit 250).');\nif (topThemes.length < 2 || topThemes.length > 4) warnings.push('Expected 2-4 top themes, got ' + topThemes.length + '.');\nif (quotes.length < 2) warnings.push('Fewer than 2 user quotes.');\nif (actions.length !== 3) warnings.push('Expected 3 action ideas, got ' + actions.length + '.');\nif (arr(fee.explanation_bullets).length > 6) warnings.push('Fee explainer had more than 6 bullets; trimmed to 6.');\nif (sources.length !== 2) warnings.push('Expected 2 official source links, got ' + sources.length + '.');\nif (!feeIssue || /none found|no recurring/i.test(feeIssue)) warnings.push('No recurring fee/charge confusion was identified.');\n\nconst preview = [\n  warnings.length ? '⚠ CHECKS:\\n' + warnings.map(w => '- ' + w).join('\\n') + '\\n' : '✅ All format checks passed.\\n',\n  'If approved, the following will be APPENDED to the Google Doc and saved as a Gmail DRAFT (not sent).',\n  '',\n  'EMAIL SUBJECT: ' + subject,\n  '',\n  docNote\n].join('\\n');\n\nreturn [{\n  json: {\n    product,\n    date,\n    last_checked: lastChecked,\n    subject,\n    doc_note: docNote,\n    email_body: emailBody,\n    record,\n    pulse_word_count: pulseWords,\n    warnings,\n    preview\n  }\n}];\n"
+        "jsCode": "// Prepare Data: parse both model outputs, build the Doc note, email and approval preview.\n\nfunction getText(item) {\n  const j = (item && item.json) || {};\n  if (typeof j.output === 'string') return j.output;\n  if (Array.isArray(j.output)) {\n    // With web search on, output[] contains a web_search_call first, then the message.\n    for (const o of j.output) {\n      if (o && o.type === 'message' && Array.isArray(o.content)) {\n        const c = o.content.find(x => typeof x.text === 'string');\n        if (c) return c.text;\n      }\n    }\n    for (const o of j.output) {\n      if (o && Array.isArray(o.content) && o.content[0] && typeof o.content[0].text === 'string') {\n        return o.content[0].text;\n      }\n    }\n  }\n  if (typeof j.text === 'string') return j.text;\n  if (j.message && typeof j.message.content === 'string') return j.message.content;\n  throw new Error('Could not find model text in: ' + JSON.stringify(j).slice(0, 500));\n}\n\nfunction parseJson(text, label) {\n  const s = text.replace(/```json|```/gi, '').trim();\n  const a = s.indexOf('{');\n  const b = s.lastIndexOf('}');\n  if (a === -1 || b === -1) throw new Error(label + ' did not return JSON: ' + s.slice(0, 300));\n  return JSON.parse(s.slice(a, b + 1));\n}\n\nconst arr = v => Array.isArray(v) ? v.filter(Boolean).map(String) : (v ? [String(v)] : []);\nconst stripQuotes = q => q.replace(/^[\"“”']+|[\"“”']+$/g, '').trim();\n\nconst pulse = parseJson(getText($('Message a model1').first()), 'Weekly Pulse model');\nconst fee = parseJson(getText($('Message a model2').first()), 'Fee Explainer model');\nconst form = $('Analyze Webhook').first().json.body;\n\nconst product = String(form.product_name || 'Product').trim();\nconst date = $now.toFormat('yyyy-MM-dd');\nconst lastChecked = $now.toFormat('dd LLL yyyy, HH:mm ZZZZ');\n\nconst topThemes = arr(pulse.top_themes);\nconst quotes = arr(pulse.supporting_quotes).map(stripQuotes);\nconst actions = arr(pulse.action_ideas);\nconst keyObservation = String(pulse.key_observation || '');\n\nconst feeIssue = String(fee.identified_fee_issue || '');\nconst reviewSignal = String(fee.user_confusion_from_reviews || '');\nconst bullets = arr(fee.explanation_bullets).slice(0, 6);\nconst sources = arr(fee.source_links).slice(0, 2);\n\n// ---------- Weekly pulse (<=250 words) ----------\nconst weeklyPulse = [\n  'Top themes:',\n  ...topThemes.map(t => '• ' + t),\n  '',\n  'What users are saying:',\n  ...quotes.map(q => '\"' + q + '\"'),\n  '',\n  'Key observation:',\n  keyObservation,\n  '',\n  'Action ideas for the product team:',\n  ...actions.map((a, i) => (i + 1) + '. ' + a)\n].join('\\n');\nconst pulseWords = weeklyPulse.split(/\\s+/).filter(Boolean).length;\n\n// ---------- Fee explainer snippet ----------\nconst feeSnippet = [\n  'Fee: ' + feeIssue,\n  '',\n  ...bullets.map(b => '• ' + b),\n  '',\n  'Official sources:',\n  ...sources.map(s => '• ' + s),\n  '',\n  'Last checked: ' + lastChecked\n].join('\\n');\n\n// ---------- Structured record required by the brief ----------\nconst record = {\n  date,\n  top_themes: topThemes,\n  weekly_pulse: weeklyPulse,\n  identified_fee_issue: feeIssue,\n  explanation_bullets: bullets,\n  source_links: sources\n};\n\nconst line = '='.repeat(60);\n\nconst docNote = [\n  '',\n  line,\n  'WEEKLY PRODUCT PULSE — ' + product + ' — ' + date,\n  line,\n  '',\n  'Date: ' + date,\n  '',\n  'Top Themes:',\n  ...topThemes.map(t => '• ' + t),\n  '',\n  'Weekly Pulse:',\n  weeklyPulse,\n  '',\n  'Identified Fee Issue:',\n  feeIssue,\n  reviewSignal ? 'Review signal: ' + reviewSignal : '',\n  '',\n  'Explanation:',\n  ...bullets.map(b => '• ' + b),\n  '',\n  'Official Sources:',\n  ...sources.map(s => '• ' + s),\n  '',\n  'Last checked: ' + lastChecked,\n  '',\n  'Structured record (JSON):',\n  JSON.stringify(record, null, 2),\n  ''\n].join('\\n');\n\nconst subject = 'Weekly Product Pulse + Customer Clarification — ' + product + ' (' + date + ')';\n\nconst emailBody = [\n  'Hi team,',\n  '',\n  'Here is this week\\'s product pulse for ' + product + ', plus a reusable support snippet for the fee users keep asking about.',\n  '',\n  '----- WEEKLY PRODUCT PULSE -----',\n  '',\n  weeklyPulse,\n  '',\n  '----- CUSTOMER FEE/CHARGE CLARIFICATION (reusable support snippet) -----',\n  '',\n  feeSnippet,\n  '',\n  'Thanks'\n].join('\\n');\n\n// ---------- Quality checks shown on the approval page ----------\nconst warnings = [];\nif (pulseWords > 250) warnings.push('Weekly pulse is ' + pulseWords + ' words (limit 250).');\nif (topThemes.length < 2 || topThemes.length > 4) warnings.push('Expected 2-4 top themes, got ' + topThemes.length + '.');\nif (quotes.length < 2) warnings.push('Fewer than 2 user quotes.');\nif (actions.length !== 3) warnings.push('Expected 3 action ideas, got ' + actions.length + '.');\nif (arr(fee.explanation_bullets).length > 6) warnings.push('Fee explainer had more than 6 bullets; trimmed to 6.');\nif (sources.length !== 2) warnings.push('Expected 2 official source links, got ' + sources.length + '.');\nif (!feeIssue || /none found|no recurring/i.test(feeIssue)) warnings.push('No recurring fee/charge confusion was identified.');\n\nconst preview = [\n  warnings.length ? '⚠ CHECKS:\\n' + warnings.map(w => '- ' + w).join('\\n') + '\\n' : '✅ All format checks passed.\\n',\n  'If approved, the following will be APPENDED to the Google Doc and saved as a Gmail DRAFT (not sent).',\n  '',\n  'EMAIL SUBJECT: ' + subject,\n  '',\n  docNote\n].join('\\n');\n\n// Step-1 analysis text (themes with counts, fee confusion) for the website.\nconst analysisText = getText($('Message a model').first());\nconst reviewCount = ($('Aggregate').first().json.reviews || []).length;\n\nreturn [{\n  json: {\n    pulse,\n    fee,\n    analysis_text: analysisText,\n    review_count: reviewCount,\n    product,\n    date,\n    last_checked: lastChecked,\n    subject,\n    doc_note: docNote,\n    email_body: emailBody,\n    record,\n    pulse_word_count: pulseWords,\n    warnings,\n    preview\n  }\n}];\n"
       },
       "id": "cdc76764-a510-432f-816b-bd9aa113d4ab",
       "name": "Prepare Data",
@@ -201,82 +164,8 @@
     },
     {
       "parameters": {
-        "formFields": {
-          "values": [
-            {
-              "fieldLabel": "Decision",
-              "fieldType": "dropdown",
-              "fieldOptions": {
-                "values": [
-                  {
-                    "option": "Approve"
-                  },
-                  {
-                    "option": "Reject"
-                  }
-                ]
-              },
-              "requiredField": true
-            },
-            {
-              "fieldLabel": "Reviewer notes",
-              "fieldType": "textarea"
-            }
-          ]
-        },
-        "options": {
-          "formTitle": "Approval required before MCP actions",
-          "formDescription": "={{ $json.preview }}",
-          "buttonLabel": "Submit decision"
-        }
-      },
-      "id": "9f4bbd6b-c899-4f7d-a610-46da18f1b0bf",
-      "name": "Approval",
-      "type": "n8n-nodes-base.form",
-      "typeVersion": 1,
-      "position": [
-        736,
-        304
-      ],
-      "webhookId": "43495060-bd26-473a-a85d-7af44e9c0e05"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "7287bc3d-6b9e-45ca-a018-7388072cb9db",
-              "leftValue": "={{ $json.Decision }}",
-              "rightValue": "Approve",
-              "operator": {
-                "type": "string",
-                "operation": "equals"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "id": "0262baf3-17b2-4bb0-bc48-1f91e163fe23",
-      "name": "Approved?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        960,
-        304
-      ]
-    },
-    {
-      "parameters": {
         "promptType": "define",
-        "text": "=A human reviewer has APPROVED the content below. Your only job is to log it with the two MCP tools.\n\nCall each tool exactly once:\n1. The Google Docs tool (\"Update a document in Google Docs\"): pass the DOC NOTE below, verbatim, as the text to insert.\n2. The Gmail tool (\"Create a draft in Gmail\"): Subject = SUBJECT below, Message = EMAIL BODY below, both verbatim.\n\nRules:\n- Copy text exactly. Do not reword, summarise, shorten, translate or reformat anything (keep line breaks, quotes and URLs exactly).\n- Create a DRAFT only. Never send email.\n- Do not retry a tool unless it explicitly returns an error.\n- Do not ask for confirmation; approval has already been given.\n\nAfter both calls succeed, reply only:\nGoogle Doc updated successfully.\nGmail draft created successfully.\n\nIf a call fails, reply with the tool name and the error message.\n\nSUBJECT:\n{{ $('Prepare Data').first().json.subject }}\n\nDOC NOTE (between the markers, markers excluded):\n<<<START>>>\n{{ $('Prepare Data').first().json.doc_note }}\n<<<END>>>\n\nEMAIL BODY (between the markers, markers excluded):\n<<<START>>>\n{{ $('Prepare Data').first().json.email_body }}\n<<<END>>>",
+        "text": "=A human reviewer has APPROVED the content below. Your only job is to log it with the two MCP tools.\n\nCall each tool exactly once:\n1. The Google Docs tool (\"Update a document in Google Docs\"): pass the DOC NOTE below, verbatim, as the text to insert.\n2. The Gmail tool (\"Create a draft in Gmail\"): Subject = SUBJECT below, Message = EMAIL BODY below, both verbatim.\n\nRules:\n- Copy text exactly. Do not reword, summarise, shorten, translate or reformat anything (keep line breaks, quotes and URLs exactly).\n- Create a DRAFT only. Never send email.\n- Do not retry a tool unless it explicitly returns an error.\n- Do not ask for confirmation; approval has already been given.\n\nAfter both calls succeed, reply only:\nGoogle Doc updated successfully.\nGmail draft created successfully.\n\nIf a call fails, reply with the tool name and the error message.\n\nSUBJECT:\n{{ $('Approve Webhook').first().json.body.subject }}\n\nDOC NOTE (between the markers, markers excluded):\n<<<START>>>\n{{ $('Approve Webhook').first().json.body.doc_note }}\n<<<END>>>\n\nEMAIL BODY (between the markers, markers excluded):\n<<<START>>>\n{{ $('Approve Webhook').first().json.body.email_body }}\n<<<END>>>",
         "options": {
           "systemMessage": "You are a careful tool-calling agent. You copy approved content into tools exactly as given and never invent, edit or send anything.",
           "maxIterations": 6
@@ -336,52 +225,74 @@
     },
     {
       "parameters": {
-        "operation": "completion",
-        "completionTitle": "Done ✅",
-        "completionMessage": "={{ $json.output }}\n\nSubject: {{ $('Prepare Data').first().json.subject }}\nCheck your Google Doc and Gmail Drafts folder.",
+        "httpMethod": "POST",
+        "path": "review-pulse/analyze",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -992,
+        304
+      ],
+      "id": "68d34be7-605e-418d-8318-ae7071f8a2f7",
+      "name": "Analyze Webhook",
+      "webhookId": "bc18a605-2651-4d4f-9c22-11fa1f3d48a9"
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem",
         "options": {}
       },
-      "id": "c0038d11-47f2-4934-9e35-bae3d8b0f468",
-      "name": "Logged",
-      "type": "n8n-nodes-base.form",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        736,
+        304
+      ],
+      "id": "da343693-28eb-4ed7-add0-1d46d7776acd",
+      "name": "Return Analysis"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "review-pulse/approve",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        960,
+        304
+      ],
+      "id": "fa672fab-1653-4bbb-b667-bca0e336d019",
+      "name": "Approve Webhook",
+      "webhookId": "f7bf13df-c35e-4521-84ca-45d8642a549d"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: 'logged', output: $json.output, subject: $('Approve Webhook').first().json.body.subject }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
       "position": [
         1568,
         192
       ],
-      "webhookId": "1e52c7fd-7577-4d70-b40a-20dceb4279c0"
-    },
-    {
-      "parameters": {
-        "operation": "completion",
-        "completionTitle": "Rejected — nothing was logged",
-        "completionMessage": "No Google Doc entry or Gmail draft was created. Edit the CSV or prompts and run the form again.",
-        "options": {}
-      },
-      "id": "be522787-032f-4902-bbaf-2c994a2f47a5",
-      "name": "Rejected",
-      "type": "n8n-nodes-base.form",
-      "typeVersion": 1,
-      "position": [
-        1168,
-        640
-      ],
-      "webhookId": "7e2a6937-32c2-4643-91a8-a0a723751334"
+      "id": "20cf1825-1484-45fd-a5b6-111b093cee3d",
+      "name": "Return Logged"
     }
   ],
   "pinData": {},
   "connections": {
-    "On form submission": {
-      "main": [
-        [
-          {
-            "node": "Extract from File",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Extract from File": {
       "main": [
         [
@@ -457,36 +368,7 @@
       "main": [
         [
           {
-            "node": "Approval",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Approval": {
-      "main": [
-        [
-          {
-            "node": "Approved?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Approved?": {
-      "main": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Rejected",
+            "node": "Return Analysis",
             "type": "main",
             "index": 0
           }
@@ -497,7 +379,7 @@
       "main": [
         [
           {
-            "node": "Logged",
+            "node": "Return Logged",
             "type": "main",
             "index": 0
           }
@@ -521,6 +403,28 @@
           {
             "node": "AI Agent",
             "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approve Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
             "index": 0
           }
         ]

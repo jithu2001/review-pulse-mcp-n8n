@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Review Pulse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="atmosphere" aria-hidden="true">
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+    <div class="orb orb-c"></div>
+    <div class="grain"></div>
+  </div>
+
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#" id="brand">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        Review&nbsp;Pulse
+      </a>
+      <ol class="steps" id="steps" aria-label="Progress">
+        <li data-step="upload"><span>01</span>Upload</li>
+        <li data-step="analyze"><span>02</span>Analyse</li>
+        <li data-step="review"><span>03</span>Review</li>
+        <li data-step="done"><span>04</span>Done</li>
+        <b class="steps-pill" aria-hidden="true"></b>
+      </ol>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ 1. UPLOAD ============ -->
+    <section id="view-upload" class="view">
+      <div class="wrap hero">
+        <p class="eyebrow" data-reveal><span class="dot"></span>Review intelligence · n8n + MCP</p>
+        <h1 class="display split">Turn a thousand reviews into <em>one clear</em> weekly pulse.</h1>
+        <p class="lede" data-reveal style="--d:.5s">Drop in an app-store export. We cluster the themes, pull real quotes, find the fee people keep tripping over and fact-check it against official sources. Nothing gets written to Google Docs or Gmail until you approve it.</p>
+      </div>
+
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track">
+          <span>Cluster themes</span><span>Extract real quotes</span><span>Detect fee confusion</span><span>Fact-check with web search</span><span>Human approval</span><span>Log via MCP</span>
+          <span>Cluster themes</span><span>Extract real quotes</span><span>Detect fee confusion</span><span>Fact-check with web search</span><span>Human approval</span><span>Log via MCP</span>
+        </div>
+      </div>
+
+      <div class="wrap">
+        <form id="upload-form" class="panel upload" novalidate data-reveal>
+          <div class="upload-fields">
+            <label class="field">
+              <span class="label">Product name</span>
+              <input type="text" name="product_name" placeholder="e.g. Groww" autocomplete="off" required>
+            </label>
+            <label class="field">
+              <span class="label">Official sources <small>optional</small></span>
+              <textarea name="official_sources" rows="4" placeholder="Pricing or help-centre URLs, one per line"></textarea>
+            </label>
+            <p class="error" id="upload-error" role="alert" hidden></p>
+            <button type="submit" class="btn btn-primary magnetic" id="submit-btn">
+              <span>Analyse reviews</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+
+          <label class="drop" id="dropzone">
+            <input type="file" name="binary_file" id="file-input" accept=".csv,text/csv" required>
+            <svg class="drop-border" aria-hidden="true"><rect x="1" y="1" rx="20" ry="20"/></svg>
+            <div class="drop-empty" id="drop-empty">
+              <div class="drop-icon" aria-hidden="true">
+                <svg viewBox="0 0 48 48"><path d="M24 32V12M15 21l9-9 9 9"/><path d="M10 30v6a2 2 0 0 0 2 2h24a2 2 0 0 0 2-2v-6"/></svg>
+              </div>
+              <p class="drop-title">Drop your reviews CSV</p>
+              <p class="drop-sub">or <u>browse files</u> · last 8–12 weeks works best</p>
+            </div>
+            <div class="drop-full" id="drop-full" hidden>
+              <p class="file-name" id="file-name"></p>
+              <div class="file-stats" id="file-stats"></div>
+              <p class="drop-sub">Click or drop to replace</p>
+            </div>
+          </label>
+        </form>
+
+        <ol class="how">
+          <li data-reveal style="--d:.05s"><span class="how-n">01</span><h3>Upload</h3><p>Any review export with a text column. Ratings and dates unlock the charts.</p></li>
+          <li data-reveal style="--d:.15s"><span class="how-n">02</span><h3>Analyse</h3><p>GPT-4.1 clusters themes and writes a 250-word pulse. Web search backs the fee explainer.</p></li>
+          <li data-reveal style="--d:.25s"><span class="how-n">03</span><h3>Review</h3><p>See every theme, quote and source, plus the exact text that would be written.</p></li>
+          <li data-reveal style="--d:.35s"><span class="how-n">04</span><h3>Approve</h3><p>An agent logs it to Google Docs and drafts a Gmail email via MCP. It never sends.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ 2. ANALYSING ============ -->
+    <section id="view-analyze" class="view" hidden>
+      <div class="wrap analyze">
+        <div class="analyze-main">
+          <p class="eyebrow"><span class="dot live"></span>Working · <span id="a-product"></span></p>
+          <h2 class="display-sm">Reading every review<span class="ellipsis"><i>.</i><i>.</i><i>.</i></span></h2>
+          <div class="clock"><span id="timer">0:00</span><small>elapsed · usually 1–3 min</small></div>
+          <div class="progress" aria-hidden="true"><i id="progress-bar"></i></div>
+          <ol class="pipeline" id="pipeline"></ol>
+        </div>
+        <aside class="ticker panel" id="ticker-panel" aria-hidden="true">
+          <p class="ticker-head">From your file</p>
+          <div class="ticker-window"><div class="ticker-track" id="ticker"></div></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ 3. REVIEW ============ -->
+    <section id="view-review" class="view" hidden>
+      <div class="wrap report">
+        <header class="report-head">
+          <p class="eyebrow" data-reveal><span class="dot"></span>Weekly product pulse</p>
+          <h1 class="display split" id="r-title">Product</h1>
+          <div class="chips" id="r-meta" data-reveal style="--d:.3s"></div>
+          <button class="btn btn-ghost" id="download-btn" type="button" data-reveal style="--d:.4s">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg>
+            <span>Download report</span>
+          </button>
+        </header>
+
+        <div id="checks" class="checks" data-reveal></div>
+
+        <section class="block" id="dataset-card" data-reveal>
+          <header class="block-head"><span class="num">01</span><h2>Snapshot</h2></header>
+          <div class="stats" id="stats"></div>
+          <div class="charts">
+            <div class="panel chart">
+              <h3>Rating distribution</h3>
+              <div id="rating-bars" class="bars"></div>
+            </div>
+            <div class="panel chart">
+              <h3>Reviews per week</h3>
+              <div id="week-bars" class="cols"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="block" data-reveal>
+          <header class="block-head"><span class="num">02</span><h2>Top themes</h2></header>
+          <ol id="r-themes" class="themes"></ol>
+          <details class="drawer">
+            <summary><span>Full theme analysis</span><small>All themes with counts</small><i aria-hidden="true"></i></summary>
+            <div class="drawer-body"><pre id="r-analysis"></pre></div>
+          </details>
+        </section>
+
+        <section class="block" data-reveal>
+          <header class="block-head"><span class="num">03</span><h2>In their words</h2></header>
+          <div id="r-quotes" class="quotes"></div>
+        </section>
+
+        <section class="block split-2" data-reveal>
+          <div>
+            <header class="block-head"><span class="num">04</span><h2>Key observation</h2></header>
+            <p class="observation" id="r-observation"></p>
+          </div>
+          <div>
+            <header class="block-head"><span class="num">05</span><h2>Action ideas</h2></header>
+            <ol id="r-actions" class="actions-list"></ol>
+          </div>
+        </section>
+
+        <section class="block" data-reveal>
+          <header class="block-head"><span class="num">06</span><h2>Fee explainer</h2></header>
+          <div class="panel fee">
+            <p class="fee-tag">Most confusing charge</p>
+            <p class="fee-issue" id="r-fee-issue"></p>
+            <p class="fee-signal" id="r-fee-signal"></p>
+            <ul id="r-fee-bullets" class="fee-bullets"></ul>
+            <div class="sources-wrap">
+              <h3>Official sources</h3>
+              <ul id="r-sources" class="sources"></ul>
+              <p class="checked" id="r-checked"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="block" data-reveal>
+          <header class="block-head"><span class="num">07</span><h2>What will be written</h2></header>
+          <details class="drawer">
+            <summary><span>Gmail draft</span><small id="r-subject"></small><i aria-hidden="true"></i></summary>
+            <div class="drawer-body"><pre id="r-email"></pre></div>
+          </details>
+          <details class="drawer">
+            <summary><span>Google Doc note</span><small>Appended to your document</small><i aria-hidden="true"></i></summary>
+            <div class="drawer-body"><pre id="r-doc"></pre></div>
+          </details>
+        </section>
+      </div>
+
+      <div class="approval-bar" id="approval-bar">
+        <div class="wrap approval-inner">
+          <div class="approval-copy">
+            <strong>Ready to log?</strong>
+            <span>Approve to append this to Google Docs and save a Gmail <em>draft</em>. Nothing is sent.</span>
+            <p class="error" id="approve-error" role="alert" hidden></p>
+          </div>
+          <div class="approval-actions">
+            <button class="btn btn-ghost" id="reject-btn" type="button">Reject</button>
+            <button class="btn btn-primary magnetic" id="approve-btn" type="button">
+              <span class="btn-label">Approve &amp; log</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 4. DONE ============ -->
+    <section id="view-done" class="view" hidden>
+      <div class="wrap done">
+        <svg class="seal" id="seal" viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="seal-ring" cx="60" cy="60" r="52"/>
+          <path class="seal-mark seal-ok" d="M38 61l15 15 30-32"/>
+          <path class="seal-mark seal-no" d="M42 42l36 36M78 42L42 78"/>
+        </svg>
+        <h2 class="display-sm" id="done-title">Logged</h2>
+        <pre class="done-output" id="done-output"></pre>
+        <div class="done-actions">
+          <button class="btn btn-ghost" id="back-btn" type="button">Back to report</button>
+          <button class="btn btn-primary magnetic" id="restart-btn" type="button">
+            <span>Analyse another file</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

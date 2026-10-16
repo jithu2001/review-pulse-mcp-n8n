@@ -11,13 +11,14 @@ AI workflow in n8n that turns app reviews into a weekly product pulse and a fact
 
 ## What it does
 
-Product teams get hundreds of app-store reviews a week, and the useful signal (recurring complaints, real user voice, confusion about fees) is buried in noise. **review-pulse-mcp** takes a reviews CSV, clusters it into themes, pulls out real quotes, and spots the fee or charge users are most confused about. It then writes a ≤250-word weekly product pulse and a short, source-backed fee explainer for support agents. Nothing is written anywhere until a human approves it. After approval, an AI agent uses MCP tools to append the note to a Google Doc and create a Gmail draft, which it never sends.
+Product teams get hundreds of app-store reviews a week, and the useful signal (recurring complaints, real user voice, confusion about fees) is buried in noise. **review-pulse-mcp** takes a reviews CSV, clusters it into themes, pulls out real quotes, and spots the fee or charge users are most confused about. It then writes a ≤250-word weekly product pulse and a short, source-backed fee explainer for support agents. A small website handles the upload and shows the full analysis (dataset snapshot, themes, quotes, fee explainer, exactly what will be written). Nothing is written anywhere until a human approves it there. After approval, an AI agent uses MCP tools to append the note to a Google Doc and create a Gmail draft, which it never sends.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    A[/"Form<br/>product name + reviews CSV"/] --> B[Extract from File]
+    W[/"Website (web/)<br/>product name + reviews CSV"/] -- "POST /review-pulse/analyze" --> A["Analyze Webhook"]
+    A --> B[Extract from File]
     B --> C[Aggregate]
     C --> D["Step 1 · Review Intelligence<br/>≤5 themes · top 3 · 3 real quotes · 1 fee confusion"]
     D --> E["Step 2 · Weekly Product Pulse<br/>≤250 words · JSON"]
@@ -25,12 +26,13 @@ flowchart LR
     E --> G[Merge]
     F --> G
     G --> H["Prepare Data<br/>(Code node)"]
-    H --> I[/"Approval form<br/>Approve / Reject"/]
-    I --> J{Approved?}
-    J -- Approve --> K["AI Agent<br/>+ OpenAI Chat Model"]
-    J -- Reject --> R[/"Rejected<br/>nothing written"/]
+    H --> I[/"Return Analysis<br/>JSON to website"/]
+    I --> X{"Reviewer on website<br/>Approve / Reject"}
+    X -- Reject --> R[/"Nothing written"/]
+    X -- "Approve: POST /review-pulse/approve" --> AW["Approve Webhook"]
+    AW --> K["AI Agent<br/>+ OpenAI Chat Model"]
     K <--> L["MCP Client"]
-    K --> M[/"Logged"/]
+    K --> M[/"Return Logged"/]
 
     subgraph S["MCP Server workflow"]
         T["MCP Server Trigger<br/>(Bearer auth)"] --> U["Google Docs<br/>append note"]
@@ -49,6 +51,7 @@ More detail, including a map from diagram steps to n8n node names, is in [`docs/
 - **Fee-confusion detection**: identifies the one fee or charge users are most confused about.
 - **≤250-word weekly pulse**: top themes, quotes, key observation and 3 action ideas, returned as structured JSON.
 - **Fee explainer with official sources**: ≤6 neutral, facts-only bullets, backed by 2 official sources found with web search (no blogs or third-party sites).
+- **Web UI**: drag-and-drop CSV upload, live progress, a results dashboard (rating distribution, reviews per week, themes, quotes, fee explainer) and a Markdown report download.
 - **Human approval gate**: a reviewer sees the full preview and must approve before anything is written.
 - **MCP logging**: an AI agent calls MCP tools to append the note to Google Docs and create a Gmail **draft**. Email is never sent.
 
@@ -65,18 +68,21 @@ More detail, including a map from diagram steps to n8n node names, is in [`docs/
 4. **Activate the MCP Server workflow**, then copy the trigger's **Production URL**.
 5. **Paste that URL** into the `MCP Client` node's Endpoint field, replacing `YOUR_MCP_ENDPOINT_URL`.
 6. **Check Web Search** is enabled under Built-in Tools on `Message a model2` (the Fee Explainer).
-7. **Activate or test the main workflow** and open the `On form submission` form URL.
-8. **Upload the CSV.** Enter a product name, upload a reviews CSV (try [`data/flipkart-play-store-reviews.csv`](data/flipkart-play-store-reviews.csv)) and optionally paste official pricing or help URLs.
-9. **Review the preview** on the Approval page and choose **Approve**. Then check your Google Doc and your Gmail Drafts folder.
+7. **Activate the main workflow.** Copy the Production URLs of `Analyze Webhook` and `Approve Webhook` into [`web/config.js`](web/config.js). Both webhooks allow any origin (`Allowed Origins (CORS)` = `*`); set it to your website's origin if you host it publicly.
+8. **Serve the website**: `python3 -m http.server 8080 -d web`, then open <http://localhost:8080>.
+9. **Upload the CSV.** Enter a product name, upload a reviews CSV (try [`data/flipkart-play-store-reviews.csv`](data/flipkart-play-store-reviews.csv)) and optionally paste official pricing or help URLs. Analysis takes 1–3 minutes.
+10. **Review the results** and choose **Approve & log**. Then check your Google Doc and your Gmail Drafts folder.
+
+> **Long requests:** the analyze call stays open until all three model calls finish. If n8n sits behind a reverse proxy, raise its read timeout above 3 minutes (nginx defaults to 60 s).
 
 ## Where MCP approval happens
 
-Approval happens on the **Approval form page**, which comes right after the `Prepare Data` node. The page shows the full Doc note, email subject and body, and the reviewer picks **Approve** or **Reject** (with optional notes).
+Approval happens on the website's **Review** page, which shows the full analysis, the Doc note and the email subject and body.
 
-- **Approve**: the `Approved?` IF node routes to the **AI Agent**, which calls the MCP tools (Google Docs append and Gmail draft).
-- **Reject**: the workflow ends on the `Rejected` page. **Nothing is written** to Google Docs or Gmail.
+- **Approve**: the website posts the subject, Doc note and email body to `Approve Webhook`, which runs the **AI Agent**. The agent calls the MCP tools (Google Docs append and Gmail draft), and the result is shown on the **Done** page.
+- **Reject**: the website never calls n8n again. **Nothing is written** to Google Docs or Gmail.
 
-The AI Agent and the MCP Client are only reachable through the Approve branch.
+The AI Agent and the MCP Client are only reachable through `Approve Webhook`. Like the old n8n form, the webhooks are public URLs, so anyone who knows the approve URL can trigger a write. Add Header Auth on the webhooks or put n8n behind your own auth if that matters for your deployment.
 
 ## Screenshots
 
@@ -84,8 +90,8 @@ The AI Agent and the MCP Client are only reachable through the Approve branch.
 |---|---|---|
 | 1 | ![Main workflow canvas](screenshots/01-main-workflow-canvas.png) | Main workflow after a successful run: form → analysis → approval → AI Agent + MCP Client. |
 | 2 | ![MCP Server canvas](screenshots/02-mcp-server-canvas.png) | MCP Server workflow exposing the Gmail draft and Google Docs update tools. |
-| 3 | ![Upload form](screenshots/03-upload-form.png) | Upload form: product name, reviews CSV and optional official sources. |
-| 4 | _TODO: add `screenshots/04-approval-form.png`_ | Approval page with the preview and Approve/Reject dropdown. |
+| 3 | ![Upload form](screenshots/03-upload-form.png) | Legacy n8n upload form, now replaced by the website in [`web/`](web). |
+| 4 | _TODO: add `screenshots/04-website-review.png`_ | Website Review page: dataset snapshot, themes, quotes, fee explainer and Approve/Reject. |
 | 5 | _TODO: add `screenshots/05-google-doc-entry.png`_ | Google Doc entry appended via MCP. Until then, see the [PDF export](outputs/weekly-pulse-flipkart-2026-10-07.pdf). |
 | 6 | ![Gmail draft](screenshots/06-gmail-draft.png) | Gmail draft created via MCP: weekly pulse plus a reusable fee snippet. Not sent. |
 
